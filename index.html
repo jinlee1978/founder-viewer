@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Initiatives — Founder Viewer</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; margin: 0; background: #fafafa; color: #111; }
+  @media (prefers-color-scheme: dark) { body { background: #0b0b0c; color: #eee; } .card { background: #141416 !important; border-color: #26262a !important; } .muted { color: #9aa0a6 !important; } .eyebrow { color: #9aa0a6 !important; } a { color: #8ab4f8 !important; } details { background: #141416 !important; } }
+  main { max-width: 720px; margin: 0 auto; padding: 20px 16px 64px; }
+  h1 { font-size: 22px; margin: 8px 0 4px; }
+  h2 { font-size: 18px; margin: 0 0 6px; }
+  .eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; }
+  .muted { color: #6b7280; font-size: 13px; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
+  .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #eef2ff; color: #3730a3; }
+  .pill.done { background: #ecfdf5; color: #065f46; }
+  .pill.blocked { background: #fef2f2; color: #991b1b; }
+  .deliverable { border-left: 3px solid #6366f1; padding: 8px 12px; margin: 10px 0; background: rgba(99,102,241,.04); border-radius: 0 8px 8px 0; }
+  .deliverable .who { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .deliverable .who b { color: inherit; }
+  pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  pre { background: #0b0b0c; color: #eee; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+  .body { white-space: pre-wrap; word-break: break-word; font-size: 14.5px; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: #6b7280; font-size: 13px; }
+  a { color: #2563eb; }
+  header.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .tag { font-size: 11px; color: #6b7280; }
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <div class="eyebrow">Founder Viewer</div>
+      <h1>Initiatives</h1>
+      <div class="muted">Latest specialist deliverables across all active initiatives.</div>
+    </div>
+    <div class="tag" id="updated"></div>
+  </header>
+
+  <div id="list"></div>
+
+  <p class="muted" style="margin-top:32px;font-size:12px">v0.1 · static MVP · sample data until DB wired · <a href="https://github.com/jinlee1978/founder-viewer">repo</a></p>
+</main>
+
+<script>
+const data = {
+  updatedAt: new Date().toISOString(),
+  initiatives: [
+    {
+      id: "founder-viewer",
+      title: "Founder-readable output viewer",
+      status: "in-progress",
+      brief: "Founder cannot easily view specialist deliverables posted to initiative threads. Success: read any deliverable in <5s on mobile, no nav guesswork.",
+      deliverables: [
+        { role: "engineering", at: "just now", body: "Shipped static MVP at this URL. Single index.html, mobile-first, sample data. Next: wire to live initiative DB and add /i/[slug] per-initiative pages with markdown rendering and email push to daniel.j.lee@gmail.com on every new deliverable." },
+        { role: "engineering", at: "earlier", body: "Spec + paste-ready Next.js code for /i/[slug] viewer + Resend email push on deliver. Blocked previously on missing GitHub/email tooling — now unblocked, hence this ship." },
+        { role: "chief-of-staff", at: "earlier", body: "Probation rules set: deliverables must be running artifacts (live URL + screenshot + files). 2-hour deadline for static MVP." }
+      ]
+    },
+    {
+      id: "sample-icp",
+      title: "ICP & positioning pass",
+      status: "todo",
+      brief: "Sharpen ideal customer profile and one-line positioning before next outbound batch.",
+      deliverables: [
+        { role: "strategist", at: "placeholder", body: "(no deliverables yet — sample row so the viewer shape is visible)" }
+      ]
+    },
+    {
+      id: "sample-pricing",
+      title: "Pricing page rewrite",
+      status: "done",
+      brief: "Rewrite pricing page copy to lead with outcome, not features.",
+      deliverables: [
+        { role: "marketing", at: "placeholder", body: "(sample) New headline: ‘Ship the work, not the meetings.’ Three tiers, annual toggle, FAQ trimmed to 5." }
+      ]
+    }
+  ]
+};
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function render(){
+  document.getElementById('updated').textContent = 'Updated ' + new Date(data.updatedAt).toLocaleString();
+  const list = document.getElementById('list');
+  list.innerHTML = data.initiatives.map(i => {
+    const latest = i.deliverables[0];
+    const rest = i.deliverables.slice(1);
+    const pillClass = i.status === 'done' ? 'done' : (i.status === 'blocked' ? 'blocked' : '');
+    return `
+      <section class="card" id="${esc(i.id)}">
+        <div class="row">
+          <h2>${esc(i.title)}</h2>
+          <span class="pill ${pillClass}">${esc(i.status)}</span>
+        </div>
+        <div class="muted" style="margin-top:6px">${esc(i.brief)}</div>
+        ${latest ? `
+          <div class="deliverable">
+            <div class="who">Latest — <b>${esc(latest.role)}</b> · ${esc(latest.at)}</div>
+            <div class="body">${esc(latest.body)}</div>
+          </div>` : '<div class="muted" style="margin-top:8px">No deliverables yet.</div>'}
+        ${rest.length ? `
+          <details>
+            <summary>Earlier (${rest.length})</summary>
+            ${rest.map(d => `
+              <div class="deliverable">
+                <div class="who"><b>${esc(d.role)}</b> · ${esc(d.at)}</div>
+                <div class="body">${esc(d.body)}</div>
+              </div>`).join('')}
+          </details>` : ''}
+      </section>`;
+  }).join('');
+}
+render();
+</script>
+</body>
+</html>
